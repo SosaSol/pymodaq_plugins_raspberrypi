@@ -58,14 +58,15 @@ Installation Instructions
   - `pigpio`: Library for controlling GPIO pins via PWM, necessary for controlling the servo motor.
 
 Steps to Install
+================
 
 1. **Clone the Repository**: Clone the repository to your Raspberry Pi.
    .. code-block:: shell
 
-    git clone https://github.com/sosasol/pymodaq_plugins_raspberrypi.git
+      git clone https://github.com/sosasol/pymodaq_plugins_raspberrypi.git
 
-2. **Install the plugin**. Run the following code.
+2. **Install the plugin**: Run the following code.
    .. code-block:: shell
 
-    cd pymodaq_plugins_raspberrypi
-    pip install .
+      cd pymodaq_plugins_raspberrypi
+      pip install .
