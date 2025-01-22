@@ -61,11 +61,13 @@ Steps to Install
 ================
 
 1. **Clone the Repository**: Clone the repository to your Raspberry Pi.
+
    .. code-block:: bash
 
       git clone https://github.com/sosasol/pymodaq_plugins_raspberrypi.git
 
 2. **Install the plugin**: Run the following code.
+
    .. code-block:: bash
 
       cd pymodaq_plugins_raspberrypi
