@@ -1,10 +1,21 @@
 pymodaq_plugins_raspberrypi
 ==========================
 
-![Latest Version](https://img.shields.io/pypi/v/pymodaq_plugins_raspberrypi.svg)
-[![Documentation Status](https://readthedocs.org/projects/pymodaq/badge/?version=latest)](https://pymodaq.readthedocs.io/en/stable/?badge=latest)
-[![Publication Status](https://github.com/PyMoDAQ/pymodaq_plugins_raspberrypi/workflows/Upload%20Python%20Package/badge.svg)](https://github.com/PyMoDAQ/pymodaq_plugins_raspberrypi)
-[![Test Status](https://github.com/PyMoDAQ/pymodaq_plugins_raspberrypi/actions/workflows/Test.yml/badge.svg)](https://github.com/PyMoDAQ/pymodaq_plugins_raspberrypi/actions/workflows/Test.yml)
+.. image:: https://img.shields.io/pypi/v/pymodaq_plugins_raspberrypi.svg
+   :target: https://pypi.org/project/pymodaq_plugins_template/
+   :alt: Latest Version
+
+.. image:: https://readthedocs.org/projects/pymodaq/badge/?version=latest
+   :target: (https://pymodaq.readthedocs.io/en/stable/?badge=latest
+   :alt: Documentation Status
+
+.. image:: https://github.com/PyMoDAQ/pymodaq_plugins_raspberrypi/workflows/Upload%20Python%20Package/badge.svg
+   :target: https://github.com/PyMoDAQ/pymodaq_plugins_raspberrypi
+   :alt: Publication Status
+
+.. image:: https://github.com/PyMoDAQ/pymodaq_plugins_raspberrypi/actions/workflows/Test.yml/badge.svg
+    :target: https://github.com/PyMoDAQ/pymodaq_plugins_raspberrypi/actions/workflows/Test.yml
+
 
 The `pymodaq_plugins_raspberrypi` repository provides PyMoDAQ plugins for controlling hardware using Raspberry Pi GPIOs. It includes the ability to control servos using the `gpiozero` and `pigpio` libraries, allowing easy integration with PyMoDAQ's motion control system.
 
@@ -13,9 +24,9 @@ Authors
 
 * Solim Rovera (solim.rovera@student.isae-supaero.fr)
 
-  Contributors
-  ===========
-  * ChatGPT
+    Contributors
+    ===========
+    * ChatGPT
 
 Instruments
 ===========
@@ -45,8 +56,6 @@ This plugin can be extended by adding more actuator control types or additional 
 Installation Instructions
 =========================
 
-Requirements
-
 - **PyMoDAQ Version**: >= 4.0
 - **Tested On**: Raspberry Pi 4 B+
 - **Required Libraries**:
@@ -56,8 +65,12 @@ Requirements
 Steps to Install
 
 1. **Clone the Repository**: Clone the repository to your Raspberry Pi.
-   ```bash
+   .. codeblock::
 
-   git clone https://github.com/sosasol/pymodaq_plugins_raspberrypi.git
-   
-   cd pymodaq_plugins_raspberrypi
+    git clone https://github.com/sosasol/pymodaq_plugins_raspberrypi.git
+
+2. **Install the plugin**: run the following code.
+   .. codeblock::
+
+    cd pymodaq_plugins_raspberrypi
+    pip install .
