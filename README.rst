@@ -1,4 +1,4 @@
-# pymodaq_plugins_raspberrypi
+pymodaq_plugins_raspberrypi
 ==========================
 
 ![Latest Version](https://img.shields.io/pypi/v/pymodaq_plugins_raspberrypi.svg)
@@ -8,44 +8,44 @@
 
 The `pymodaq_plugins_raspberrypi` repository provides PyMoDAQ plugins for controlling hardware using Raspberry Pi GPIOs. It includes the ability to control servos using the `gpiozero` and `pigpio` libraries, allowing easy integration with PyMoDAQ's motion control system.
 
-## Authors
+Authors
 =======
 
 * Solim Rovera (solim.rovera@student.isae-supaero.fr)
 
-Contributors
-===========
-* ChatGPT
+  Contributors
+  ===========
+  * ChatGPT
 
-## Instruments
+Instruments
 ===========
 
 This plugin contains the following instruments:
 
-### Actuators
+Actuators
 +++++++++
 
 * **Servo**: Control of an SG90 servo motor using PWM signals with the `gpiozero` and `pigpio` libraries. The servo can be positioned within a range of 0° to 180°.
 
-### Viewers and Detectors
+Viewers and Detectors
 ++++++++++
 
 This plugin currently does not support any 0D, 1D, or 2D detectors, but these could be added in future versions.
 
-## PID Models
+PID Models
 ==========
 This plugin currently does not include any PID models.
 
-## Extensions
+Extensions
 ===========
 This plugin can be extended by adding more actuator control types or additional detector support.
 
 ---
 
-## Installation Instructions
+Installation Instructions
 =========================
 
-### Requirements
+Requirements
 
 - **PyMoDAQ Version**: >= 4.0
 - **Tested On**: Raspberry Pi 4 B+
@@ -53,7 +53,7 @@ This plugin can be extended by adding more actuator control types or additional 
   - `gpiozero`: Python library for controlling the GPIO pins.
   - `pigpio`: Library for controlling GPIO pins via PWM, necessary for controlling the servo motor.
 
-### Steps to Install
+Steps to Install
 
 1. **Clone the Repository**: Clone the repository to your Raspberry Pi.
    ```bash
