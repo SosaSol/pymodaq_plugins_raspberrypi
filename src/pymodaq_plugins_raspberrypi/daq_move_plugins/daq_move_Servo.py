@@ -30,7 +30,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
 
     is_multiaxes = False
     _axis_names: Union[List[str], Dict[str, int]] = ['Servo']
-    _controller_units: Union[str, List[str]] = 'Degrees'
+    _controller_units: Union[str, List[str]] = 'deg'
     _epsilon: Union[float, List[float]] = 0.1
     data_actuator_type = DataActuatorType.DataActuator  # Actuator type is a DataActuator
 
