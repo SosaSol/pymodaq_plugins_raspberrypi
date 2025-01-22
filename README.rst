@@ -1,12 +1,14 @@
 pymodaq_plugins_raspberrypi
 ###########################
 
+.. the following must be adapted to your developed package, links to pypi, github  description...
+
 .. image:: https://img.shields.io/pypi/v/pymodaq_plugins_raspberrypi.svg
-   :target: https://pypi.org/project/pymodaq_plugins_template/
+   :target: https://pypi.org/project/pymodaq_plugins_raspberrypi/
    :alt: Latest Version
 
 .. image:: https://readthedocs.org/projects/pymodaq/badge/?version=latest
-   :target: (https://pymodaq.readthedocs.io/en/stable/?badge=latest
+   :target: https://pymodaq.readthedocs.io/en/stable/?badge=latest
    :alt: Documentation Status
 
 .. image:: https://github.com/PyMoDAQ/pymodaq_plugins_raspberrypi/workflows/Upload%20Python%20Package/badge.svg
@@ -56,9 +58,9 @@ This plugin can be extended by adding more actuator control types or additional 
 Installation Instructions
 =========================
 
-- **PyMoDAQ Version**: >= 4.0
-- **Tested On**: Raspberry Pi 4 B+
-- **Required Libraries**:
+* **PyMoDAQ Version**: >= 4.0
+* **Tested On**: Raspberry Pi 4 B+
+* **Required Libraries**:
   - `gpiozero`: Python library for controlling the GPIO pins.
   - `pigpio`: Library for controlling GPIO pins via PWM, necessary for controlling the servo motor.
 
