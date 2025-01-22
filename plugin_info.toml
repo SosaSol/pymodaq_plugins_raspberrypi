@@ -1,24 +1,22 @@
 ## To modify by developer(s) of the plugin
 
 [plugin-info]
-SHORT_PLUGIN_NAME = 'template'  #to be modified, for instance daqmx then rename the module name:
-# (pymodaq_plugins_template become pymodaq_plugins_daqmx for instance)
+SHORT_PLUGIN_NAME = 'raspberrypi'  # Updated to reflect the plugin's purpose
 
-package-url = 'https://github.com/PyMoDAQ/pymodaq_plugins_template' #to modify
-description = 'some word about your plugin'
+package-url = 'https://github.com/SosaSol/pymodaq_plugins_raspberrypi'  # Updated with the correct repository URL
+description = 'A PyMoDAQ plugin for controlling Raspberry Pi GPIO and servo motors using gpiozero and pigpio.'
 
-author = 'Author Name'
-author-email = 'Author email'
+author = 'Solim Rovera'
+author-email = 'solim.rovera@student.isae-supaero.fr'
 license = 'MIT'
 
 [plugin-install]
-#packages required for your plugin:
-packages-required = ['pymodaq>=4.3.6']
+# Packages required for your plugin:
+packages-required = ['pymodaq>=4.3.6', 'gpiozero', 'pigpio']
 
-[features]  # defines the plugin features contained into this plugin
-instruments = true  # true if plugin contains instrument classes (else false, notice the lowercase for toml files)
-extensions = false  # true if plugins contains dashboard extensions
-models = false  # true if plugins contains pid models or other models (optimisation...)
-h5exporters = false  # true if plugin contains custom h5 file exporters
-scanners = false  # true if plugin contains custom scan layout (daq_scan extensions)
-
+[features]  # Defines the plugin features contained in this plugin
+instruments = true  # This plugin contains instrument classes
+extensions = false  # This plugin does not contain dashboard extensions
+models = false  # No PID models or optimization models included
+h5exporters = false  # No custom h5 file exporters included
+scanners = false  # No custom scan layouts included
