@@ -97,7 +97,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
         target_position = max(0, min(target_position, 180))
 
         # Move the servo to the target position
-        self.controller.move_abs(target_position)
+        self.controller.move_to_angle(target_position)
 
         # Update the current position attribute
         self.current_position = target_position
@@ -106,7 +106,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
         self.emit_status(ThreadCommand('Update_Status', [f"Servo poition incredmented by {value.value()},from {current_position} degrees to {target_position} degrees."]))
     
     def move_Home(self):
-        self.controller.move_abs(0)
+        self.controller.move_to_angle(0)
         self.emit_status(ThreadCommand('Update_Status',) ['Servo moved home to 0 degrees.'])
 
 if __name__ == '__main__':
