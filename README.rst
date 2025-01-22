@@ -27,9 +27,6 @@ Authors
 
 * Solim Rovera (solim.rovera@student.isae-supaero.fr)
 
-    Contributors
-    ============
-    * ChatGPT
 
 Instruments
 ===========
@@ -41,20 +38,15 @@ Actuators
 
 * **Servo**: Control of an SG90 servo motor using PWM signals with the `gpiozero` and `pigpio` libraries. The servo can be positioned within a range of 0° to 180°.
 
-Viewers and Detectors
-++++++++++
-
-* This plugin currently does not support any 0D, 1D, or 2D detectors, but these could be added in future versions.
 
 PID Models
 ==========
+
 This plugin currently does not include any PID models.
 
 Extensions
 ===========
-This plugin can be extended by adding more actuator control types or additional detector support.
 
----
 
 Installation Instructions
 =========================
