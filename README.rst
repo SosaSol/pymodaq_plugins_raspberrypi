@@ -25,7 +25,7 @@ This plugin contains the following instruments:
 ### Actuators
 +++++++++
 
-* **Servo**: Control of an SG90 servo motor using PWM signals with the `gpiozero` and `pigpio` libraries. The servo can be positioned within a range of 0� to 180�.
+* **Servo**: Control of an SG90 servo motor using PWM signals with the `gpiozero` and `pigpio` libraries. The servo can be positioned within a range of 0° to 180°.
 
 ### Viewers and Detectors
 ++++++++++
@@ -57,5 +57,7 @@ This plugin can be extended by adding more actuator control types or additional 
 
 1. **Clone the Repository**: Clone the repository to your Raspberry Pi.
    ```bash
+
    git clone https://github.com/sosasol/pymodaq_plugins_raspberrypi.git
+   
    cd pymodaq_plugins_raspberrypi
