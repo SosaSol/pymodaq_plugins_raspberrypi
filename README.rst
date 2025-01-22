@@ -1,5 +1,5 @@
 pymodaq_plugins_raspberrypi
-########################
+###########################
 
 .. image:: https://img.shields.io/pypi/v/pymodaq_plugins_raspberrypi.svg
    :target: https://pypi.org/project/pymodaq_plugins_template/
@@ -25,7 +25,7 @@ Authors
 * Solim Rovera (solim.rovera@student.isae-supaero.fr)
 
     Contributors
-    ===========
+    ============
     * ChatGPT
 
 Instruments
