@@ -44,7 +44,7 @@ Actuators
 Viewers and Detectors
 ++++++++++
 
-This plugin currently does not support any 0D, 1D, or 2D detectors, but these could be added in future versions.
+* This plugin currently does not support any 0D, 1D, or 2D detectors, but these could be added in future versions.
 
 PID Models
 ==========
@@ -68,12 +68,12 @@ Installation Instructions
 Steps to Install
 
 1. **Clone the Repository**: Clone the repository to your Raspberry Pi.
-   .. codeblock::
+   .. code-block:: shell
 
     git clone https://github.com/sosasol/pymodaq_plugins_raspberrypi.git
 
-2. **Install the plugin**: run the following code.
-   .. codeblock::
+2. **Install the plugin**. Run the following code.
+   .. code-block:: shell
 
     cd pymodaq_plugins_raspberrypi
-    pip install
+    pip install .
