@@ -116,6 +116,12 @@ class DAQ_Move_Servo(DAQ_Move_base):
         except RuntimeError as e:
             self.emit_status(ThreadCommand("Update_Status", [f"Error moving servo to home position: {e}"]))
 
+    def stop_motion(self):
+        """Stop any ongoing motion of the servo."""
+        self.controller.move_to_angle(self.controller.get_current_angle())  # Hold position
+        self.emit_status(ThreadCommand("Update_Status", ["Servo motion stopped."]))
+
+
     def get_actuator_value(self):
         """Get the current value of the servo (angle in degrees)."""
         current_angle = self.controller.get_current_angle()
