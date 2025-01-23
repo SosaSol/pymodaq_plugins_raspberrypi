@@ -46,7 +46,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
     
     is_multiaxes = False  # Single-axis servo
     _axis_names = ['Servo']
-    _controller_units = 'Degree'
+    _controller_units = 'deg'
     _epsilon: Union[float, list] = 0.1
     data_actuator_type = DataActuatorType["DataActuator"]
 
