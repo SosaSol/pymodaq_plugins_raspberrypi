@@ -41,8 +41,8 @@ class DAQ_1DViewer_DistanceSensor(DAQ_Viewer_base):
     Compatible with HC-SR04 ultrasonic distance sensors.
     """
     params = comon_parameters + [
-        {"title": "Trigger Pin:", "name": "trigger_pin", "type": "int", "value": 23, "min": 0, "max": 40, "step": 1},
-        {"title": "Echo Pin:", "name": "echo_pin", "type": "int", "value": 24, "min": 0, "max": 40, "step": 1},
+        {"title": "Trigger Pin:", "name": "trigger_pin", "type": "int", "value": 17, "min": 0, "max": 40, "step": 1},
+        {"title": "Echo Pin:", "name": "echo_pin", "type": "int", "value": 18, "min": 0, "max": 40, "step": 1},
         {"title": "Update Interval (s):", "name": "update_interval", "type": "float", "value": 0.1, "min": 0.01},
         {"title": "X Axis Label:", "name": "x_label", "type": "str", "value": "Time (s)"},
         {"title": "Y Axis Label:", "name": "y_label", "type": "str", "value": "Distance (cm)"},
@@ -76,7 +76,7 @@ class DAQ_1DViewer_DistanceSensor(DAQ_Viewer_base):
             self.controller = DistanceSensorWrapper(trigger_pin, echo_pin)
 
         self.start_time = time.time()
-        self.x_axis = Axis(data=[], label=self.settings["x_label"], units="s", index=0)
+        self.x_axis = Axis(data=np.array([]), label=self.settings["x_label"], units="s", index=0)
 
         # Emit an empty data structure to initialize viewers
         self.dte_signal_temp.emit(DataToExport(name="DistanceSensor",
