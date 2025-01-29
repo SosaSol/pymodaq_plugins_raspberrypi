@@ -72,3 +72,9 @@ Steps to Install
 
       cd pymodaq_plugins_raspberrypi
       pip install .
+
+3. **Activate pigpiod**: You will have an error when using the plugin unless you activate pigpiod with the following code:
+
+   .. code-block:: bash
+      
+      sudo pigpiod
