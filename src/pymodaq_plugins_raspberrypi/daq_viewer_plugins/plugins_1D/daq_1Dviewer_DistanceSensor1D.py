@@ -33,7 +33,7 @@ class DistanceSensorWrapper:
         self.sensor.close()
 
 
-class DAQ_1DViewer_DistanceSensor(DAQ_Viewer_base):
+class DAQ_1DViewer_DistanceSensor1D(DAQ_Viewer_base):
     """
     Instrument plugin class for a 1D viewer for the HC-SR04 ultrasonic sensor.
     Measures distance over time and displays it in a viewer.
