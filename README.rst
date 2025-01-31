@@ -38,6 +38,12 @@ Actuators
 
 * **Servo**: Control of an SG90 servo motor using PWM signals with the `gpiozero` and `pigpio` libraries. The servo can be positioned within a range of 0° to 180°.
 
+Viewer0D
+++++++++
+
+* *RPitemperature*: Raspberry Pi CPU Temperature Sensor. Monitors and displays the Raspberry Pi CPU temperature in real-time. The temperature is updated based on a configurable sampling time or frequency.
+* *DistanceSensor*: Distance Sensor (HC-SR04). Measures distance using the HC-SR04 ultrasonic sensor, with adjustable trigger and echo pins, and configurable sampling interval.
+
 
 PID Models
 ==========
