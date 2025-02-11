@@ -38,7 +38,7 @@ class DAQ_0DViewer_DistanceSensor(DAQ_Viewer_base):
     params = comon_parameters + [
         {"title": "Trigger Pin:", "name": "trigger_pin", "type": "int", "value": 17, "min": 0, "max": 40, "step": 1},
         {"title": "Echo Pin:", "name": "echo_pin", "type": "int", "value": 18, "min": 0, "max": 40, "step": 1},
-        {"title": "Update Interval (ms):", "name": "update_interval", "type": "float", "value": 5.0, "min": 0.001},
+        {"title": "Update Interval (ms):", "name": "update_interval", "type": "float", "value": 100.0, "min": 0.001},
         {"title": "Distance Label:", "name": "y_label", "type": "str", "value": "Distance (cm)"},
     ]
 
