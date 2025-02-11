@@ -32,16 +32,9 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
     def ini_attributes(self):
         """Initialize attributes."""
         self.controller = TemperatureSensorWrapper()
-        self.running = False
-
-        # Initialize QTimer for periodic data grabbing
-        self.data_grabber_timer = QTimer()
-        self.data_grabber_timer.timeout.connect(self.grab_data)
-        self.sync_sampling_params()  # Set initial timer interval
 
     def commit_settings(self, param: Parameter):
         """Apply parameter changes and synchronize sampling settings."""
-
         if param.name() == "sampling_time":
             self.data_grabber_timer.setInterval(int(self.settings["sampling_time"])) # Set the timer interval in ms
 
@@ -52,22 +45,19 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
     def ini_detector(self, controller=None):
         """Initialize detector."""
         self.ini_detector_init(slave_controller=controller)
-        self.running = True  # Set running flag
-        self.data_grabber_timer.start()  # Start the timer
 
-        # Send initial data to PyMoDAQ
+        # Initialize PyMoDAQ viewer with a placeholder value
         self.dte_signal_temp.emit(DataToExport(name="RPi_Temperature",
                                                data=[DataFromPlugins(name="Temperature",
                                                                      data=[np.array([0])],  # Placeholder data
                                                                      dim="Data0D",
                                                                      labels=[self.settings["y_label"]])]))
         return "Raspberry Pi CPU Temperature Sensor initialized", True
+    
+        
 
     def grab_data(self, Naverage=1, **kwargs):
         """Acquire temperature data."""
-        if not self.running:
-            return
-
         temperature = self.controller.get_cpu_temperature()
         y_data = np.array([temperature])
 
@@ -78,15 +68,13 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
                                                                 labels=[self.settings["y_label"]])]))
 
     def stop(self):
-        """Stop data acquisition."""
-        self.running = False
-        self.data_grabber_timer.stop()
+        """Clean up resources."""
+        if self.controller:
+            self.controller.close_communication()
         self.emit_status(ThreadCommand("Update_Status", ["Temperature monitoring stopped."]))
 
     def close(self):
         """Close the detector."""
-        self.running = False
-        self.data_grabber_timer.stop()
         self.emit_status(ThreadCommand("Update_Status", ["RPi Temperature Sensor closed."]))
 
 
