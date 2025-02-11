@@ -36,7 +36,7 @@ class DAQ_2DViewer_Camera(DAQ_Viewer_base):
 
     def ini_attributes(self):
         self.controller: str = None
-        self.video_capture = cv2.VideoCapture(1)  # Usar a câmera padrão (câmera do PC)
+        self.video_capture = cv2.VideoCapture(0)  # Usar a câmera padrão (câmera do PC)
         if not self.video_capture.isOpened():
             raise RuntimeError("Não foi possível acessar a câmera.")
         self.x_axis = None
