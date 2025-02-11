@@ -41,7 +41,7 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
 
     def ini_detector(self, controller=None):
         """Initialize detector."""
-        # self.controller = TemperatureSensorWrapper()  # Ensure controller is initialized
+        self.controller = TemperatureSensorWrapper()  # Ensure controller is initialized
         self.ini_detector_init(slave_controller=controller)
 
         # Send initial dummy data to PyMoDAQ
