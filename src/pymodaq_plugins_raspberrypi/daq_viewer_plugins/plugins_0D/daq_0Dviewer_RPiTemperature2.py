@@ -21,7 +21,7 @@ class TemperatureSensorWrapper:
             print(f"Error reading temperature: {e}")
             return None  # Return None if an error occurs
 
-class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
+class DAQ_0DViewer_RPiTemperature2(DAQ_Viewer_base):
     """PyMoDAQ 0D viewer plugin for monitoring the Raspberry Pi CPU temperature."""
     
     # Add signals
