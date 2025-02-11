@@ -6,7 +6,7 @@ from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, como
 from pymodaq.utils.parameter import Parameter
 
 
-class TemperatureSensorWrapper:
+class TemperatureSensor:
     """Wrapper for reading the CPU temperature of the Raspberry Pi."""
     
     def __init__(self):
@@ -23,7 +23,6 @@ class TemperatureSensorWrapper:
             return None  # Return None if an error occurs
 
 
-
 class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
     """
     PyMoDAQ 0D viewer plugin for monitoring the Raspberry Pi CPU temperature.
@@ -36,7 +35,7 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
 
     def ini_attributes(self):
         """Initialize attributes."""
-        self.controller: TemperatureSensorWrapper = None  
+        self.controller: TemperatureSensor = None  # Ensure it's initially None, later we will initialize it
 
     def commit_settings(self, param: Parameter):
         """Apply parameter changes and synchronize sampling settings."""
@@ -44,13 +43,15 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
             self.data_grabber_timer.setInterval(int(self.settings["sampling_time"]))  # Update sampling time
         elif param.name() == "y_label":
             self.y_axis_label = param.value()
-            
+
     def ini_detector(self, controller=None):
         """Initialize detector."""
+        # Initialize the controller if it's not already set
         if self.controller is None:
-            self.emit_status(ThreadCommand("Update_Status", ["Error: Controller not initialized."]))
-            return
+            # Initialize the controller here, before using it
+            self.controller = TemperatureSensor()
 
+        # Continue with the initialization as normal
         self.ini_detector_init(slave_controller=controller)
 
         # Send initial dummy data to PyMoDAQ
@@ -61,10 +62,9 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
                                                                      labels=[self.settings["y_label"]])]))
         return "Raspberry Pi CPU Temperature Sensor initialized", True
 
-
     def grab_data(self, Naverage=1, **kwargs):
         """Acquire temperature data."""
-        temperature = self.controller.get_cpu_temperature()
+        temperature = self.controller.get_temperature()  # Use controller's method
         y_data = np.array([temperature])
 
         self.dte_signal.emit(DataToExport(name="RPi_Temperature",
