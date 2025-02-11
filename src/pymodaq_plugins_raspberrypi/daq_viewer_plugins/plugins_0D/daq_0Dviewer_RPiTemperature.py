@@ -11,13 +11,13 @@ class TemperatureSensorWrapper:
 
     def __init__(self):
         """Ensure the wrapper is properly initialized."""
-        pass  # No attributes needed for now
+        pass
 
     def get_cpu_temperature(self):
         """Read the CPU temperature from the Raspberry Pi system file."""
         try:
             with open("/sys/class/thermal/thermal_zone0/temp", "r") as file:
-                return int(file.read()) / 1000  # Convert from millidegrees to degrees Celsius
+                return float(file.read()) / 1000  # Convert from millidegrees to degrees Celsius
         except Exception as e:
             print(f"Error reading temperature: {e}")
             return None  # Return None if an error occurs
@@ -36,12 +36,21 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
 
     def ini_attributes(self):
         """Initialize attributes."""
-        self.controller = TemperatureSensorWrapper()  # Proper instantiation
+        self.controller: TemperatureSensorWrapper = None  
 
-
+    def commit_settings(self, param: Parameter):
+        """Apply parameter changes and synchronize sampling settings."""
+        if param.name() == "sampling_time":
+            self.data_grabber_timer.setInterval(int(self.settings["sampling_time"]))  # Update sampling time
+        elif param.name() == "y_label":
+            self.y_axis_label = param.value()
+            
     def ini_detector(self, controller=None):
         """Initialize detector."""
-        self.controller = TemperatureSensorWrapper()  # Ensure controller is initialized
+        if self.controller is None:
+            self.emit_status(ThreadCommand("Update_Status", ["Error: Controller not initialized."]))
+            return
+
         self.ini_detector_init(slave_controller=controller)
 
         # Send initial dummy data to PyMoDAQ
@@ -52,12 +61,6 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
                                                                      labels=[self.settings["y_label"]])]))
         return "Raspberry Pi CPU Temperature Sensor initialized", True
 
-    def commit_settings(self, param: Parameter):
-        """Apply parameter changes and synchronize sampling settings."""
-        if param.name() == "sampling_time":
-            self.data_grabber_timer.setInterval(int(self.settings["sampling_time"]))  # Update sampling time
-        elif param.name() == "y_label":
-            self.y_axis_label = param.value()
 
     def grab_data(self, Naverage=1, **kwargs):
         """Acquire temperature data."""
