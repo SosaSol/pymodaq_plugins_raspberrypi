@@ -25,7 +25,7 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
     """
 
     params = comon_parameters + [
-        {"title": "Sampling Time (ms):", "name": "sampling_time", "type": "float", "value": 1000.0, "min": 1.0},
+        {"title": "Sampling Time (ms):", "name": "sampling_time", "type": "float", "value": 100.0, "min": 1.0},
         {"title": "Temperature Label:", "name": "y_label", "type": "str", "value": "CPU Temperature (°C)"},
     ]
 
