@@ -36,7 +36,7 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
 
     def ini_attributes(self):
         """Initialize attributes."""
-        self.controller: TemperatureSensorWrapper = None  # Proper instantiation
+        self.controller = TemperatureSensorWrapper()  # Proper instantiation
 
 
     def ini_detector(self, controller=None):
