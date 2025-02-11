@@ -81,7 +81,7 @@ class DAQ_2DViewer_Camera(DAQ_Viewer_base):
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         Nx = self.settings.child('Nx').value()
         Ny = self.settings.child('Ny').value()
-        #data_mock = cv2.resize(frame_gray, (Nx, Ny), interpolation=cv2.INTER_AREA)
+        frame_rgb = cv2.resize(frame_rgb, (Nx, Ny), interpolation=cv2.INTER_AREA)
         self.image = frame_rgb
         self.x_axis = Axis(label='the x axis', data=np.linspace(0, Nx, Nx, endpoint=False), index=1)
         self.y_axis = Axis(label='the y axis', data=np.linspace(0, Ny, Ny, endpoint=False), index=0)
