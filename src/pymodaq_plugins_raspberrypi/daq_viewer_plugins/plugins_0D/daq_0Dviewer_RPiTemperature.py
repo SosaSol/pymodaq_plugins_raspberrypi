@@ -48,8 +48,12 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
         """Initialize detector."""
         # Initialize the controller if it's not already set
         if self.controller is None:
-            # Initialize the controller here, before using it
-            self.controller = TemperatureSensor()
+            self.controller = TemperatureSensor()  # Initialize controller
+
+        # Check if controller was successfully initialized
+        if self.controller is None:
+            self.emit_status(ThreadCommand("Update_Status", ["Error: Controller not initialized."]))
+            return "Error: Controller not initialized", False
 
         # Continue with the initialization as normal
         self.ini_detector_init(slave_controller=controller)
@@ -64,7 +68,17 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
 
     def grab_data(self, Naverage=1, **kwargs):
         """Acquire temperature data."""
+        if self.controller is None:
+            print("Controller is not initialized!")
+            self.emit_status(ThreadCommand("Update_Status", ["Error: Controller not initialized."]))
+            return
+        
         temperature = self.controller.get_temperature()  # Use controller's method
+        
+        if temperature is None:
+            print("Failed to read temperature!")
+            return
+
         y_data = np.array([temperature])
 
         self.dte_signal.emit(DataToExport(name="RPi_Temperature",
