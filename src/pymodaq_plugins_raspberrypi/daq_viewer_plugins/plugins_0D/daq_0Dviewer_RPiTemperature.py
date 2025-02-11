@@ -8,15 +8,15 @@ from pymodaq.utils.parameter import Parameter
 
 class TemperatureSensorWrapper:
     """Wrapper for reading the CPU temperature of the Raspberry Pi."""
-
+    
     def __init__(self):
-        """Ensure the wrapper is properly initialized."""
-        pass
+        """Initialize the temperature sensor (in this case, it's just the CPU temperature file)."""
+        self.sensor = "/sys/class/thermal/thermal_zone0/temp"  # Path to the CPU temperature file
 
-    def get_cpu_temperature(self):
-        """Read the CPU temperature from the Raspberry Pi system file."""
+    def get_temperature(self) -> float:
+        """Fetch the CPU temperature (in °C)."""
         try:
-            with open("/sys/class/thermal/thermal_zone0/temp", "r") as file:
+            with open(self.sensor, "r") as file:
                 return float(file.read()) / 1000  # Convert from millidegrees to degrees Celsius
         except Exception as e:
             print(f"Error reading temperature: {e}")
