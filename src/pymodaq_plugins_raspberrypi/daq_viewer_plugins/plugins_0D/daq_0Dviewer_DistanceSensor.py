@@ -38,7 +38,7 @@ class DAQ_0DViewer_DistanceSensor(DAQ_Viewer_base):
     params = comon_parameters + [
         {"title": "Trigger Pin:", "name": "trigger_pin", "type": "int", "value": 17, "min": 0, "max": 40, "step": 1},
         {"title": "Echo Pin:", "name": "echo_pin", "type": "int", "value": 18, "min": 0, "max": 40, "step": 1},
-        {"title": "Update Interval (s):", "name": "update_interval", "type": "float", "value": 0.05, "min": 0.01},
+        {"title": "Update Interval (ms):", "name": "update_interval", "type": "float", "value": 5.0, "min": 0.001},
         {"title": "Distance Label:", "name": "y_label", "type": "str", "value": "Distance (cm)"},
     ]
 
@@ -49,7 +49,7 @@ class DAQ_0DViewer_DistanceSensor(DAQ_Viewer_base):
     def commit_settings(self, param: Parameter):
         """Apply parameter changes dynamically."""
         if param.name() == "update_interval":
-            self.data_grabber_timer.setInterval(int(self.settings["update_interval"] * 1000))
+            self.data_grabber_timer.setInterval(int(self.settings["update_interval"]))
 
         elif param.name() == "y_label":
             self.y_axis_label = param.value()
