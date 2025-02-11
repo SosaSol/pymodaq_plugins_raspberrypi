@@ -9,14 +9,19 @@ from pymodaq.utils.parameter import Parameter
 class TemperatureSensorWrapper:
     """Wrapper for reading the CPU temperature of the Raspberry Pi."""
 
-    @staticmethod
-    def get_cpu_temperature():
+    def __init__(self):
+        """Ensure the wrapper is properly initialized."""
+        pass  # No attributes needed for now
+
+    def get_cpu_temperature(self):
         """Read the CPU temperature from the Raspberry Pi system file."""
         try:
             with open("/sys/class/thermal/thermal_zone0/temp", "r") as file:
                 return int(file.read()) / 1000  # Convert from millidegrees to degrees Celsius
         except Exception as e:
-            return np.nan  # Return NaN if an error occurs
+            print(f"Error reading temperature: {e}")
+            return None  # Return None if an error occurs
+
 
 
 class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
@@ -28,6 +33,11 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
         {"title": "Sampling Time (ms):", "name": "sampling_time", "type": "float", "value": 100.0, "min": 1.0},
         {"title": "Temperature Label:", "name": "y_label", "type": "str", "value": "CPU Temperature (°C)"},
     ]
+
+    def ini_attributes(self):
+        """Initialize attributes."""
+        self.controller: TemperatureSensorWrapper = None  # Proper instantiation
+
 
     def ini_detector(self, controller=None):
         """Initialize detector."""
