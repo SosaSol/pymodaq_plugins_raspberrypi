@@ -79,13 +79,16 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
             print("Failed to read temperature!")
             return
 
+        print(f"Temperature: {temperature}")  # Add this line to see the value
+
         y_data = np.array([temperature])
 
         self.dte_signal.emit(DataToExport(name="RPi_Temperature",
-                                          data=[DataFromPlugins(name="Temperature",
+                                        data=[DataFromPlugins(name="Temperature",
                                                                 data=y_data,
                                                                 dim="Data0D",
                                                                 labels=[self.settings["y_label"]])]))
+
 
     def stop(self):
         """Clean up resources."""
