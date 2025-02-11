@@ -6,7 +6,7 @@ from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, como
 from pymodaq.utils.parameter import Parameter
 
 
-class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
+class DAQ_0DViewer_RPiTemperature2(DAQ_Viewer_base):
     """
     PyMoDAQ 0D viewer plugin for monitoring the Raspberry Pi CPU temperature.
     """
