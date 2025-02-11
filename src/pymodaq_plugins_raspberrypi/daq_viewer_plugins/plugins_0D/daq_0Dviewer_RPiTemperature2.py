@@ -6,23 +6,6 @@ from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, como
 from pymodaq.utils.parameter import Parameter
 
 
-class TemperatureSensorWrapper:
-    """Wrapper for reading the CPU temperature of the Raspberry Pi."""
-
-    def __init__(self):
-        """Ensure the wrapper is properly initialized."""
-        pass
-
-    def get_cpu_temperature(self):
-        """Read the CPU temperature from the Raspberry Pi system file."""
-        try:
-            with open("/sys/class/thermal/thermal_zone0/temp", "r") as file:
-                return float(file.read()) / 1000  # Convert from millidegrees to degrees Celsius
-        except Exception as e:
-            print(f"Error reading temperature: {e}")
-            return None  # Return None if an error occurs
-
-
 class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
     """
     PyMoDAQ 0D viewer plugin for monitoring the Raspberry Pi CPU temperature.
@@ -36,7 +19,6 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
     def __init__(self):
         """Ensure the viewer is properly initialized."""
         super().__init__()
-        self.controller = TemperatureSensorWrapper()  # Initialize the controller here
 
     def commit_settings(self, param: Parameter):
         """Apply parameter changes and synchronize sampling settings."""
@@ -45,10 +27,21 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
         elif param.name() == "y_label":
             self.y_axis_label = param.value()
 
+    def get_cpu_temperature(self):
+        """Read the CPU temperature from the Raspberry Pi system file."""
+        try:
+            with open("/sys/class/thermal/thermal_zone0/temp", "r") as file:
+                return float(file.read()) / 1000  # Convert from millidegrees to degrees Celsius
+        except Exception as e:
+            print(f"Error reading temperature: {e}")
+            return None  # Return None if an error occurs
+
     def ini_detector(self, controller=None):
         """Initialize detector."""
-        if self.controller is None:
-            self.emit_status(ThreadCommand("Update_Status", ["Error: Controller not initialized."]))
+        # Initialize detector and check if the temperature can be read
+        temperature = self.get_cpu_temperature()
+        if temperature is None:
+            self.emit_status(ThreadCommand("Update_Status", ["Error: Unable to read temperature."]))
             return
 
         self.ini_detector_init(slave_controller=controller)
@@ -63,7 +56,7 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
 
     def grab_data(self, Naverage=1, **kwargs):
         """Acquire temperature data."""
-        temperature = self.controller.get_cpu_temperature()
+        temperature = self.get_cpu_temperature()
         if temperature is None:
             self.emit_status(ThreadCommand("Update_Status", ["Error reading temperature."]))
             return
@@ -83,7 +76,6 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
     def close(self):
         """Close the detector."""
         self.emit_status(ThreadCommand("Update_Status", ["RPi Temperature Sensor closed."]))
-
 
 
 if __name__ == "__main__":
