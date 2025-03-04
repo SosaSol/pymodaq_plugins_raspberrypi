@@ -1,3 +1,4 @@
+import subprocess
 from typing import Union
 from pymodaq.control_modules.move_utility_classes import (
     DAQ_Move_base, comon_parameters_fun, main, DataActuatorType, DataActuator
@@ -61,8 +62,21 @@ class DAQ_Move_Servo(DAQ_Move_base):
         """Initialize attributes, including the servo controller."""
         self.controller: ServoWrapper = None  # Servo controller object
 
+    def start_pigpiod_if_needed(self):
+        """Ensure that pigpiod is running before initializing the servo."""
+        try:
+            # Check if pigpiod is running by using pgrep to look for the pigpiod process
+            subprocess.check_call(['pgrep', 'pigpiod'])
+        except subprocess.CalledProcessError:
+            # If pigpiod is not running, start it
+            subprocess.Popen(['sudo', 'pigpiod'])
+            self.emit_status(ThreadCommand("Update_Status", ["Starting pigpiod daemon..."]))
+
+
     def ini_stage(self, controller=None):
         """Initialize the servo and communication."""
+        self.start_pigpiod_if_needed()  # Ensure pigpiod is running
+        
         gpio_pin = self.settings["gpio_pin"]            # Get GPIO pin from settings
         default_angle = self.settings["default_angle"]  # Get Dfault Angle pin from settings
 
