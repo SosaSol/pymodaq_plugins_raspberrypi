@@ -98,7 +98,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
     def move_abs(self, value: DataActuator):
         """Move the servo to an absolute position (angle in degrees)."""
         target_angle = self.check_bound(value.data)  # Enforce angle limits
-        self.target_value = target_angle
+        self.target_value = DataActuator(data=target_angle, units=self._controller_units)
 
         try:
             self.controller.move_to_angle(target_angle)
@@ -110,7 +110,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
         """Move the servo to a position relative to its current position."""
         current_angle = self.controller.get_current_angle()
         target_angle = self.check_bound(current_angle + value.data)  # Enforce limits
-        self.target_value = target_angle
+        self.target_value = DataActuator(data=target_angle, units=self._controller_units)
 
         try:
             self.controller.move_to_angle(target_angle)
@@ -139,7 +139,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
     def get_actuator_value(self):
         """Get the current value of the servo (angle in degrees)."""
         current_angle = self.controller.get_current_angle()
-        return DataActuator(data=current_angle)
+        return DataActuator(data=current_angle, units=self._controller_units)
 
     def close(self):
         """Terminate the communication protocol."""
