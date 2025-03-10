@@ -101,7 +101,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
         self.target_value = DataActuator(data=target_angle, units=self._controller_units)
 
         try:
-            self.controller.move_to_angle(target_angle)
+            self.controller.move_to_angle(self.target_value.data)
             self.emit_status(ThreadCommand("Update_Status", [f"Servo moved to {target_angle:.2f} degrees."]))
         except RuntimeError as e:
             self.emit_status(ThreadCommand("Update_Status", [f"Error moving servo: {e}"]))
@@ -113,7 +113,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
         self.target_value = DataActuator(data=target_angle, units=self._controller_units)
 
         try:
-            self.controller.move_to_angle(target_angle)
+            self.controller.move_to_angle(self.target_value.data)
             self.emit_status(ThreadCommand("Update_Status", [
                 f"Servo moved by {value.data:.2f} degrees to {target_angle:.2f} degrees."
             ]))
@@ -123,9 +123,9 @@ class DAQ_Move_Servo(DAQ_Move_base):
     def move_home(self):
         """Move the servo to the home position (0 degrees)."""
         home = self.settings['home_position']
-        self.target_value = home
+        self.target_value = DataActuator(data=home, units=self._controller_units)
         try:
-            self.controller.move_to_angle(home)
+            self.controller.move_to_angle(self.target_value.data)
             self.emit_status(ThreadCommand("Update_Status", [f"Servo moved to home position ({home:.2f} degrees)."]))
         except RuntimeError as e:
             self.emit_status(ThreadCommand("Update_Status", [f"Error moving servo to home position: {e}"]))
