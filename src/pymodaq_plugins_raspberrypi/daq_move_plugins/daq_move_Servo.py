@@ -26,13 +26,9 @@ class ServoWrapper:
 
     def move_to_angle(self, angle: float):
         """Move the servo to a specific angle (0 to 180 degrees)."""
-
-        # Debugging print statement
         print(f"DEBUG: move_to_angle received angle = {angle}, type = {type(angle)}")
-
         if not 0.0 <= angle <= 180.0:
             raise ValueError("Angle must be between 0 and 180 degrees.")
-
         try:
             servo_value = (angle / 90) - 1  # Convert angle to servo value (-1 to 1)
             self.servo.value = servo_value
@@ -54,7 +50,6 @@ class DAQ_Move_Servo(DAQ_Move_base):
     _epsilon: Union[float, list] = 0.1
     data_actuator_type = DataActuatorType["DataActuator"]
 
-    # Define parameters for the servo plugin
     params = [
         {"title": "GPIO Pin:", "name": "gpio_pin", "type": "int", "value": 17, "min": 0, "max": 40, "step": 1},
         {"title": "Home Position:", "name": "home_position", "type": "float", "value": 0.0, "min": 0.0, "max": 180.0},
@@ -63,25 +58,22 @@ class DAQ_Move_Servo(DAQ_Move_base):
 
     def ini_attributes(self):
         """Initialize attributes, including the servo controller."""
-        self.controller: ServoWrapper = None  # Servo controller object
+        self.controller: ServoWrapper = None
 
     def start_pigpiod_if_needed(self):
         """Ensure that pigpiod is running before initializing the servo."""
         try:
-            # Check if pigpiod is running by using pgrep to look for the pigpiod process
             subprocess.check_call(['pgrep', 'pigpiod'])
         except subprocess.CalledProcessError:
-            # If pigpiod is not running, start it
             subprocess.Popen(['sudo', 'pigpiod'])
             self.emit_status(ThreadCommand("Update_Status", ["Starting pigpiod daemon..."]))
-
 
     def ini_stage(self, controller=None):
         """Initialize the servo and communication."""
         self.start_pigpiod_if_needed()  # Ensure pigpiod is running
         
-        gpio_pin = self.settings["gpio_pin"]            # Get GPIO pin from settings
-        default_angle = self.settings["default_angle"]  # Get Dfault Angle pin from settings
+        gpio_pin = self.settings["gpio_pin"]
+        default_angle = self.settings["default_angle"]
 
         if gpio_pin not in VALID_GPIO_PINS:
             info = f"Invalid GPIO pin: {gpio_pin}. Please choose a valid GPIO pin."
@@ -89,7 +81,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
             return info, False
     
         try:
-            self.controller = ServoWrapper(pin=gpio_pin, default_angle=default_angle)  # Initialize the servo
+            self.controller = ServoWrapper(pin=gpio_pin, default_angle=default_angle)
             self.controller.move_to_angle(default_angle)
             info = f"Servo initialized successfully on GPIO pin {gpio_pin}."
             initialized = True
@@ -99,12 +91,24 @@ class DAQ_Move_Servo(DAQ_Move_base):
 
         return info, initialized
 
+    @staticmethod
+    def extract_value(data):
+        """
+        Extract a single float value from data.
+        If data is a list, the first element is used.
+        If the element is a numpy array, it extracts the scalar.
+        """
+        if isinstance(data, list):
+            data = data[0]
+        if hasattr(data, "item"):
+            return data.item()
+        return float(data)
+
     def move_abs(self, value: DataActuator):
         """Move the servo to an absolute position (angle in degrees)."""
-        # Print to check what value.data contains
         print(f"DEBUG: Received value.data = {value.data}, type = {type(value.data)}")
-        
-        target_angle = self.check_bound(value.data)  # Enforce angle limits
+        angle = self.extract_value(value.data)
+        target_angle = self.check_bound(angle)  # Enforce angle limits
         self.target_value = DataActuator(data=target_angle, units=self._controller_units)
 
         try:
@@ -116,13 +120,14 @@ class DAQ_Move_Servo(DAQ_Move_base):
     def move_rel(self, value: DataActuator):
         """Move the servo to a position relative to its current position."""
         current_angle = self.controller.get_current_angle()
-        target_angle = self.check_bound(current_angle + value.data)  # Enforce limits
+        delta = self.extract_value(value.data)
+        target_angle = self.check_bound(current_angle + delta)  # Enforce limits
         self.target_value = DataActuator(data=target_angle, units=self._controller_units)
 
         try:
             self.controller.move_to_angle(self.target_value.data)
             self.emit_status(ThreadCommand("Update_Status", [
-                f"Servo moved by {value.data:.2f} degrees to {target_angle:.2f} degrees."
+                f"Servo moved by {delta:.2f} degrees to {target_angle:.2f} degrees."
             ]))
         except RuntimeError as e:
             self.emit_status(ThreadCommand("Update_Status", [f"Error moving servo: {e}"]))
@@ -141,7 +146,6 @@ class DAQ_Move_Servo(DAQ_Move_base):
         """Stop any ongoing motion of the servo."""
         self.controller.move_to_angle(self.controller.get_current_angle())  # Hold position
         self.emit_status(ThreadCommand("Update_Status", ["Servo motion stopped."]))
-
 
     def get_actuator_value(self):
         """Get the current value of the servo (angle in degrees)."""
