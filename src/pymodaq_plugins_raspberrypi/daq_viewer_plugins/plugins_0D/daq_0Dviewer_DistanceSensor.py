@@ -22,7 +22,7 @@ class DistanceSensorWrapper:
             self.trigger_pin = trigger_pin
             self.echo_pin = echo_pin
             self.max_distance = max_distance
-            self.sensor = DistanceSensor(echo=echo_pin, trigger=trigger_pin, pin_factory=pin_factory, max_distance=4)
+            self.sensor = DistanceSensor(echo=echo_pin, trigger=trigger_pin, pin_factory=pin_factory, max_distance=max_distance)
         except Exception as e:
             raise RuntimeError(f"Failed to initialize sensor on GPIO pins {trigger_pin}, {echo_pin}: {e}")
 
