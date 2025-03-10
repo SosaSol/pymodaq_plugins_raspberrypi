@@ -21,7 +21,6 @@ class ServoWrapper:
             self.factory = PiGPIOFactory()  # Set up PiGPIO for precise control
             self.servo = Servo(pin, min_pulse_width=0.0005, max_pulse_width=0.0025, pin_factory=self.factory)
             self.current_angle = default_angle  # Default position is the neutral position (90 degrees)
-            self.move_to_angle(default_angle)
         except Exception as e:
             raise RuntimeError(f"Failed to initialize servo on GPIO pin {pin}: {e}")
 
@@ -87,6 +86,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
     
         try:
             self.controller = ServoWrapper(pin=gpio_pin, default_angle=default_angle)  # Initialize the servo
+            self.move_to_angle(default_angle)
             info = f"Servo initialized successfully on GPIO pin {gpio_pin}."
             initialized = True
         except RuntimeError as e:
@@ -97,7 +97,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
 
     def move_abs(self, value: DataActuator):
         """Move the servo to an absolute position (angle in degrees)."""
-        target_angle = self.check_bound(value.value())  # Enforce angle limits
+        target_angle = self.check_bound(value.data)  # Enforce angle limits
         self.target_value = target_angle
 
         try:
