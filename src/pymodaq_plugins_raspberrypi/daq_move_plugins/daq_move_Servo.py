@@ -110,9 +110,9 @@ class DAQ_Move_Servo(DAQ_Move_base):
         angle = self.extract_value(value.data)
         target_angle = self.check_bound(angle)  # Enforce angle limits
         self.target_value = DataActuator(data=target_angle, units=self._controller_units)
-
         try:
-            self.controller.move_to_angle(self.target_value.data)
+            # Pass the float target_angle directly since move_to_angle expects a float
+            self.controller.move_to_angle(target_angle)
             self.emit_status(ThreadCommand("Update_Status", [f"Servo moved to {target_angle:.2f} degrees."]))
         except RuntimeError as e:
             self.emit_status(ThreadCommand("Update_Status", [f"Error moving servo: {e}"]))
@@ -123,9 +123,9 @@ class DAQ_Move_Servo(DAQ_Move_base):
         delta = self.extract_value(value.data)
         target_angle = self.check_bound(current_angle + delta)  # Enforce limits
         self.target_value = DataActuator(data=target_angle, units=self._controller_units)
-
         try:
-            self.controller.move_to_angle(self.target_value.data)
+            # Pass the float target_angle directly
+            self.controller.move_to_angle(target_angle)
             self.emit_status(ThreadCommand("Update_Status", [
                 f"Servo moved by {delta:.2f} degrees to {target_angle:.2f} degrees."
             ]))
@@ -137,14 +137,15 @@ class DAQ_Move_Servo(DAQ_Move_base):
         home = self.settings['home_position']
         self.target_value = DataActuator(data=home, units=self._controller_units)
         try:
-            self.controller.move_to_angle(self.target_value.data)
+            self.controller.move_to_angle(home)
             self.emit_status(ThreadCommand("Update_Status", [f"Servo moved to home position ({home:.2f} degrees)."]))
         except RuntimeError as e:
             self.emit_status(ThreadCommand("Update_Status", [f"Error moving servo to home position: {e}"]))
 
     def stop_motion(self):
         """Stop any ongoing motion of the servo."""
-        self.controller.move_to_angle(self.controller.get_current_angle())  # Hold position
+        current_angle = self.controller.get_current_angle()
+        self.controller.move_to_angle(current_angle)  # Hold position
         self.emit_status(ThreadCommand("Update_Status", ["Servo motion stopped."]))
 
     def get_actuator_value(self):
