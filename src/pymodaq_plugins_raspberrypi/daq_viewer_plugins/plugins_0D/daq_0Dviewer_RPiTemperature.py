@@ -37,9 +37,8 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
 
     def ini_attributes(self):
         """Initialize attributes."""
-        self.controller: TemperatureSensor = None  # Controller will be an instance of TemperatureSensor
-        # Optionally, you could add a debug print here:
-        print("DEBUG: ini_attributes() called. Controller set to None.")
+        self.controller: TemperatureSensor = None
+        print("DEBUG: ini_attributes() called, controller set to None.")
 
     def commit_settings(self, param: Parameter):
         """Apply parameter changes and synchronize sampling settings."""
@@ -49,46 +48,34 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
 
     def ini_detector(self, controller=None):
         """Initialize detector."""
-        # Initialize the controller if not already set
         if self.controller is None:
-            self.controller = TemperatureSensor()  # Create the TemperatureSensor instance
-            print("DEBUG: TemperatureSensor controller initialized.")
-
-        # Check if controller is successfully initialized
-        if self.controller is None:
-            self.emit_status(ThreadCommand("Update_Status", ["Error: Controller not initialized."]))
-            return "Error: Controller not initialized", False
-
-        # Continue with the standard initialization
+            self.controller = TemperatureSensor()  # Initialize controller
+            print("DEBUG: TemperatureSensor controller initialized in ini_detector().")
+        else:
+            print("DEBUG: Controller already initialized.")
         self.ini_detector_init(slave_controller=controller)
-        print("DEBUG: ini_detector_init() called.")
-
-        # Send initial dummy data to PyMoDAQ
         self.dte_signal_temp.emit(DataToExport(name="RPi_Temperature",
-                                               data=[DataFromPlugins(name="Temperature",
-                                                                     data=[np.array([0])],  # Placeholder data
-                                                                     dim="Data0D",
-                                                                     labels=[self.settings["y_label"]])]))
-        print("DEBUG: Initial dummy data emitted.")
+                                                data=[DataFromPlugins(name="Temperature",
+                                                                    data=[np.array([0])],
+                                                                    dim="Data0D",
+                                                                    labels=[self.settings["y_label"]])]))
         return "Raspberry Pi CPU Temperature Sensor initialized", True
 
     def grab_data(self, Naverage=1, **kwargs):
         """Acquire temperature data."""
         if self.controller is None:
-            print("ERROR: Controller is not initialized!")
+            print("DEBUG: In grab_data() - Controller is not initialized!")
             self.emit_status(ThreadCommand("Update_Status", ["Error: Controller not initialized."]))
             return
-        
-        temperature = self.controller.get_temperature()  # Get temperature reading
+        temperature = self.controller.get_temperature()
         if temperature is None:
-            print("ERROR: Failed to read temperature!")
+            print("DEBUG: In grab_data() - Failed to read temperature!")
             self.emit_status(ThreadCommand("Update_Status", ["Error: Failed to read temperature."]))
             return
-
-        print(f"DEBUG: Temperature read: {temperature} °C")
+        print(f"DEBUG: In grab_data() - Temperature read: {temperature} °C")
         y_data = np.array([temperature])
         self.dte_signal.emit(DataToExport(name="RPi_Temperature",
-                                          data=[DataFromPlugins(name="Temperature",
+                                        data=[DataFromPlugins(name="Temperature",
                                                                 data=y_data,
                                                                 dim="Data0D",
                                                                 labels=[self.settings["y_label"]])]))
