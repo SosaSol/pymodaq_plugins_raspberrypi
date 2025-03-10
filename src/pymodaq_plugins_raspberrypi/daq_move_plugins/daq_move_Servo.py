@@ -101,8 +101,8 @@ class DAQ_Move_Servo(DAQ_Move_base):
 
     def move_abs(self, value: DataActuator):
         """Move the servo to an absolute position (angle in degrees)."""
-        # Debugging print statement
-        print(f"DEBUG: target_angle = {target_angle}, type = {type(target_angle)}")
+        # Print to check what value.data contains
+        print(f"DEBUG: Received value.data = {value.data}, type = {type(value.data)}")
         
         target_angle = self.check_bound(value.data)  # Enforce angle limits
         self.target_value = DataActuator(data=target_angle, units=self._controller_units)
