@@ -86,7 +86,7 @@ class DAQ_Move_Servo(DAQ_Move_base):
     
         try:
             self.controller = ServoWrapper(pin=gpio_pin, default_angle=default_angle)  # Initialize the servo
-            self.move_to_angle(default_angle)
+            self.controller.move_to_angle(default_angle)
             info = f"Servo initialized successfully on GPIO pin {gpio_pin}."
             initialized = True
         except RuntimeError as e:
