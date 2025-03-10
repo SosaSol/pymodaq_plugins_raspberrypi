@@ -41,11 +41,11 @@ class DAQ_0DViewer_DistanceSensor(DAQ_Viewer_base):
     """
 
     params = comon_parameters + [
-        {"title": "Trigger Pin:", "name": "trigger_pin", "type": "int", "value": 17, "min": 0, "max": 40, "step": 1},
-        {"title": "Echo Pin:", "name": "echo_pin", "type": "int", "value": 18, "min": 0, "max": 40, "step": 1},
+        {"title": "Trigger Pin:", "name": "trigger_pin", "type": "int", "value": 27, "min": 0, "max": 40, "step": 1},
+        {"title": "Echo Pin:", "name": "echo_pin", "type": "int", "value": 22, "min": 0, "max": 40, "step": 1},
         {"title": "Update Interval (ms):", "name": "update_interval", "type": "float", "value": 100.0, "min": 0.001},
         {"title": "Distance Label:", "name": "y_label", "type": "str", "value": "Distance (cm)"},
-        {"title": "Maximum Distance:", "name": "max_distance", "type": "float", "value": 4.0, "min": 0.0}
+        {"title": "Maximum Distance:", "name": "max_distance", "type": "float", "value": 2.0, "min": 0.0}
     ]
 
     def ini_attributes(self):
