@@ -32,7 +32,6 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
     """
 
     params = comon_parameters + [
-        {"title": "Sampling Time (ms):", "name": "sampling_time", "type": "float", "value": 100.0, "min": 1.0},
         {"title": "Temperature Label:", "name": "y_label", "type": "str", "value": "CPU Temperature (°C)"},
     ]
 
@@ -44,11 +43,7 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
 
     def commit_settings(self, param: Parameter):
         """Apply parameter changes and synchronize sampling settings."""
-        if param.name() == "sampling_time":
-            # Ensure data_grabber_timer is available (should be provided by the base class)
-            self.data_grabber_timer.setInterval(int(self.settings["sampling_time"]))
-            print(f"DEBUG: Sampling time updated to {self.settings['sampling_time']} ms")
-        elif param.name() == "y_label":
+        if param.name() == "y_label":
             self.y_axis_label = param.value()
             print(f"DEBUG: Temperature label updated to {self.settings['y_label']}")
 
