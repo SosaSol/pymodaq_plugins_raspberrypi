@@ -53,14 +53,22 @@ class DAQ_0DViewer_DistanceSensor(DAQ_Viewer_base):
         self.controller: DistanceSensorWrapper = None
     
     def start_pigpiod_if_needed(self):
-        """Ensure that pigpiod is running before initializing the servo."""
+        """Ensure that pigpiod is running before initializing the sensor."""
         try:
-            # Check if pigpiod is running by using pgrep to look for the pigpiod process
             subprocess.check_call(['pgrep', 'pigpiod'])
         except subprocess.CalledProcessError:
-            # If pigpiod is not running, start it
             subprocess.Popen(['sudo', 'pigpiod'])
             self.emit_status(ThreadCommand("Update_Status", ["Starting pigpiod daemon..."]))
+            
+            # Check if it actually starts
+            import time
+            time.sleep(2)  # Wait for the process to start
+            try:
+                subprocess.check_call(['pgrep', 'pigpiod'])
+                self.emit_status(ThreadCommand("Update_Status", ["Pigpiod started successfully."]))
+            except subprocess.CalledProcessError:
+                self.emit_status(ThreadCommand("Update_Status", ["Error: Failed to start pigpiod."]))
+
 
 
     def commit_settings(self, param: Parameter):

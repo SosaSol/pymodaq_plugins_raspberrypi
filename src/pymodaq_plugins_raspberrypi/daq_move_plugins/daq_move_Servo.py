@@ -60,12 +60,22 @@ class DAQ_Move_Servo(DAQ_Move_base):
         self.controller: ServoWrapper = None
 
     def start_pigpiod_if_needed(self):
-        """Ensure that pigpiod is running before initializing the servo."""
+        """Ensure that pigpiod is running before initializing the sensor."""
         try:
             subprocess.check_call(['pgrep', 'pigpiod'])
         except subprocess.CalledProcessError:
             subprocess.Popen(['sudo', 'pigpiod'])
             self.emit_status(ThreadCommand("Update_Status", ["Starting pigpiod daemon..."]))
+            
+            # Check if it actually starts
+            import time
+            time.sleep(2)  # Wait for the process to start
+            try:
+                subprocess.check_call(['pgrep', 'pigpiod'])
+                self.emit_status(ThreadCommand("Update_Status", ["Pigpiod started successfully."]))
+            except subprocess.CalledProcessError:
+                self.emit_status(ThreadCommand("Update_Status", ["Error: Failed to start pigpiod."]))
+
 
     def ini_stage(self, controller=None):
         """Initialize the servo and communication."""
