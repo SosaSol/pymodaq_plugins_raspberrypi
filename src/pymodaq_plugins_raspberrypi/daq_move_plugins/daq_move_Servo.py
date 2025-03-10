@@ -26,7 +26,6 @@ class ServoWrapper:
 
     def move_to_angle(self, angle: float):
         """Move the servo to a specific angle (0 to 180 degrees)."""
-        print(f"DEBUG: move_to_angle received angle = {angle}, type = {type(angle)}")
         if not 0.0 <= angle <= 180.0:
             raise ValueError("Angle must be between 0 and 180 degrees.")
         try:
@@ -106,7 +105,6 @@ class DAQ_Move_Servo(DAQ_Move_base):
 
     def move_abs(self, value: DataActuator):
         """Move the servo to an absolute position (angle in degrees)."""
-        print(f"DEBUG: Received value.data = {value.data}, type = {type(value.data)}")
         angle = self.extract_value(value.data)
         target_angle = self.check_bound(angle)  # Enforce angle limits
         self.target_value = DataActuator(data=target_angle, units=self._controller_units)
