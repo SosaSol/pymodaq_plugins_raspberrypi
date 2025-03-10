@@ -1,3 +1,4 @@
+import subprocess
 import numpy as np
 from pymodaq.utils.daq_utils import ThreadCommand
 from pymodaq.utils.data import DataFromPlugins, DataToExport
@@ -5,6 +6,7 @@ from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, como
 from pymodaq.utils.parameter import Parameter
 
 from gpiozero import DistanceSensor
+from gpiozero.pins.pigpio import PiGPIOFactory
 
 VALID_GPIO_PINS = [
     2, 3, 4, 17, 18, 27, 22, 23, 24, 25, 5, 6, 12, 13, 19, 20, 21, 26, 16
@@ -13,11 +15,14 @@ VALID_GPIO_PINS = [
 class DistanceSensorWrapper:
     """Wrapper for HC-SR04 ultrasonic sensor using gpiozero."""
     
-    def __init__(self, trigger_pin: int, echo_pin: int):
+    def __init__(self, trigger_pin: int, echo_pin: int, max_distance: float):
         try:
+            # Create a PinFactory for gpiozero
+            pin_factory = PiGPIOFactory()
             self.trigger_pin = trigger_pin
             self.echo_pin = echo_pin
-            self.sensor = DistanceSensor(echo=echo_pin, trigger=trigger_pin)
+            self.max_distance = max_distance
+            self.sensor = DistanceSensor(echo=echo_pin, trigger=trigger_pin, pin_factory=pin_factory, max_distance=4)
         except Exception as e:
             raise RuntimeError(f"Failed to initialize sensor on GPIO pins {trigger_pin}, {echo_pin}: {e}")
 
@@ -40,11 +45,23 @@ class DAQ_0DViewer_DistanceSensor(DAQ_Viewer_base):
         {"title": "Echo Pin:", "name": "echo_pin", "type": "int", "value": 18, "min": 0, "max": 40, "step": 1},
         {"title": "Update Interval (ms):", "name": "update_interval", "type": "float", "value": 100.0, "min": 0.001},
         {"title": "Distance Label:", "name": "y_label", "type": "str", "value": "Distance (cm)"},
+        {"title": "Maximum Distance:", "name": "max_distance", "type": "float", "value": 4.0, "min": 0.0}
     ]
 
     def ini_attributes(self):
         """Initialize attributes."""
         self.controller: DistanceSensorWrapper = None
+    
+    def start_pigpiod_if_needed(self):
+        """Ensure that pigpiod is running before initializing the servo."""
+        try:
+            # Check if pigpiod is running by using pgrep to look for the pigpiod process
+            subprocess.check_call(['pgrep', 'pigpiod'])
+        except subprocess.CalledProcessError:
+            # If pigpiod is not running, start it
+            subprocess.Popen(['sudo', 'pigpiod'])
+            self.emit_status(ThreadCommand("Update_Status", ["Starting pigpiod daemon..."]))
+
 
     def commit_settings(self, param: Parameter):
         """Apply parameter changes dynamically."""
@@ -77,16 +94,19 @@ class DAQ_0DViewer_DistanceSensor(DAQ_Viewer_base):
 
     def ini_detector(self, controller=None):
         """Initialize detector."""
+        self.start_pigpiod_if_needed()  # Ensure pigpiod is running
+    
         self.ini_detector_init(slave_controller=controller)
 
         if self.is_master:
             trigger_pin = self.settings["trigger_pin"]
             echo_pin = self.settings["echo_pin"]
+            max_distance = self.settings["max_distance"]
 
             if trigger_pin not in VALID_GPIO_PINS or echo_pin not in VALID_GPIO_PINS:
                 raise ValueError(f"Invalid GPIO pins. Choose from: {VALID_GPIO_PINS}")
 
-            self.controller = DistanceSensorWrapper(trigger_pin, echo_pin)
+            self.controller = DistanceSensorWrapper(trigger_pin, echo_pin, max_distance)
 
         # Initialize PyMoDAQ viewer with a placeholder value
         self.dte_signal_temp.emit(DataToExport(name="DistanceSensor",
