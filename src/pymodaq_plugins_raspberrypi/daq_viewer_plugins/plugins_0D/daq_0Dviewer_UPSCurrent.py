@@ -126,7 +126,7 @@ class UPSCurrentSensor:
         value = self.read(_REG_CURRENT)
         if value > 32767:
             value -= 65535
-        return value * 0.01
+        return value * self._current_lsb
 
     def close_communication(self):
         """Close the I2C bus."""
