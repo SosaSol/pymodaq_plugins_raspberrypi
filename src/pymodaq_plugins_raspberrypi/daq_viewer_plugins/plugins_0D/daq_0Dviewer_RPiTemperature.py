@@ -43,21 +43,16 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
 
     def commit_settings(self, param: Parameter):
         """Apply parameter changes and synchronize sampling settings."""
-        print(f"DEBUG: ini_detector() called. Previous controller: {self.controller}")
         if param.name() == "y_label":
             self.y_axis_label = param.value()
-            print(f"DEBUG: Temperature label updated to {self.settings['y_label']}")
 
     def ini_detector(self, controller=None):
         """Initialize detector."""
-        if self.controller is None:
+        if self.is_master:
             self.controller = TemperatureSensor()  # Initialize controller
-            print("DEBUG: TemperatureSensor controller initialized in ini_detector().")
-        else:
-            print("DEBUG: Controller already initialized.")
-        self.ini_detector_init(slave_controller=controller)
+
         self.dte_signal_temp.emit(DataToExport(name="RPi_Temperature",
-                                                data=[DataFromPlugins(name="Temperature",
+                                               data=[DataFromPlugins(name="Temperature",
                                                                     data=[np.array([0])],
                                                                     dim="Data0D",
                                                                     labels=[self.settings["y_label"]])]))
@@ -65,19 +60,10 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
 
     def grab_data(self, Naverage=1, **kwargs):
         """Acquire temperature data."""
-        if self.controller is None:
-            print("DEBUG: In grab_data() - Controller is not initialized!")
-            self.emit_status(ThreadCommand("Update_Status", ["Error: Controller not initialized."]))
-            return
         temperature = self.controller.get_temperature()
-        if temperature is None:
-            print("DEBUG: In grab_data() - Failed to read temperature!")
-            self.emit_status(ThreadCommand("Update_Status", ["Error: Failed to read temperature."]))
-            return
-        print(f"DEBUG: In grab_data() - Temperature read: {temperature} °C")
         y_data = np.array([temperature])
         self.dte_signal.emit(DataToExport(name="RPi_Temperature",
-                                        data=[DataFromPlugins(name="Temperature",
+                                          data=[DataFromPlugins(name="Temperature",
                                                                 data=y_data,
                                                                 dim="Data0D",
                                                                 labels=[self.settings["y_label"]])]))
@@ -85,12 +71,10 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
     def stop(self):
         """Clean up resources."""
         self.emit_status(ThreadCommand("Update_Status", ["Temperature monitoring stopped."]))
-        print("DEBUG: stop() called.")
 
     def close(self):
         """Close the detector."""
         self.emit_status(ThreadCommand("Update_Status", ["RPi Temperature Sensor closed."]))
-        print("DEBUG: close() called.")
 
 if __name__ == "__main__":
     main(__file__)

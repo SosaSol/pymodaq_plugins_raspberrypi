@@ -68,8 +68,6 @@ class DAQ_0DViewer_DistanceSensor(DAQ_Viewer_base):
             except subprocess.CalledProcessError:
                 self.emit_status(ThreadCommand("Update_Status", ["Error: Failed to start pigpiod."]))
 
-
-
     def commit_settings(self, param: Parameter):
         """Apply parameter changes dynamically."""
 
