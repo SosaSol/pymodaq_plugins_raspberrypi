@@ -77,7 +77,6 @@ class UPSCurrentSensor:
             raise RuntimeError("No INA219 device found on the I²C bus!")
         print(f"DEBUG: Using INA219 device at address: {hex(self.addr)}")
 
-        self.addr = addr
         self._cal_value = 0
         self._current_lsb = 0
         self._power_lsb = 0
