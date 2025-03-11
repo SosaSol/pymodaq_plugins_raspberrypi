@@ -37,9 +37,7 @@ class DAQ_0DViewer_RPiTemperature(DAQ_Viewer_base):
 
     def ini_attributes(self):
         """Initialize attributes."""
-        print(f"DEBUG: ini_attributes() called. Previous controller: {self.controller}")
         self.controller: TemperatureSensor = None
-        print("DEBUG: ini_attributes() called, controller set to None.")
 
     def commit_settings(self, param: Parameter):
         """Apply parameter changes and synchronize sampling settings."""
