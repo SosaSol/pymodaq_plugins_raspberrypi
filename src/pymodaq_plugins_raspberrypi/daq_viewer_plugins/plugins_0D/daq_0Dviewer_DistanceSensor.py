@@ -61,7 +61,7 @@ class DAQ_0DViewer_DistanceSensor(DAQ_Viewer_base):
             
             # Check if it actually starts
             import time
-            time.sleep(2)  # Wait for the process to start
+            time.sleep(1)  # Wait for the process to start
             try:
                 subprocess.check_call(['pgrep', 'pigpiod'])
                 self.emit_status(ThreadCommand("Update_Status", ["Pigpiod started successfully."]))
