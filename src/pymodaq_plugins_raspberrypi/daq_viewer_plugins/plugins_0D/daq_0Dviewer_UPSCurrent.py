@@ -65,7 +65,7 @@ def find_ina219_address(i2c_bus=1):
 class UPSCurrentSensor:
     """Wrapper for reading current from the UPS HAT using INA219."""
     
-    def __init__(self, i2c_bus=1, addr=none):
+    def __init__(self, i2c_bus=1, addr=None):
         try:
             self.bus = smbus.SMBus(i2c_bus)
         except Exception as e:
