@@ -1,4 +1,3 @@
-import subprocess
 import numpy as np
 import smbus
 from pymodaq.utils.daq_utils import ThreadCommand
@@ -133,9 +132,6 @@ class DAQ_0DViewer_UPSCurrent(DAQ_Viewer_base):
 
     def ini_detector(self, controller=None):
         """Initialize detector."""
-
-        self.ini_detector_init(slave_controller=controller)
-
         if self.is_master:
             self.controller = UPSCurrentSensor()  # Initialize controller
 
@@ -145,7 +141,6 @@ class DAQ_0DViewer_UPSCurrent(DAQ_Viewer_base):
                                                                      data=[np.array([0])],  # Placeholder
                                                                      dim="Data0D",
                                                                      labels=[self.settings["y_label"]])]))
-        
         return "UPS Current Sensor initialized successfully", True
 
     def grab_data(self, Naverage=1, **kwargs):
@@ -167,7 +162,6 @@ class DAQ_0DViewer_UPSCurrent(DAQ_Viewer_base):
         if self.controller:
             self.controller.close_communication()
         self.emit_status(ThreadCommand("Update_Status", ["UPS Current Sensor closed."]))
-
 
 if __name__ == "__main__":
     main(__file__)
