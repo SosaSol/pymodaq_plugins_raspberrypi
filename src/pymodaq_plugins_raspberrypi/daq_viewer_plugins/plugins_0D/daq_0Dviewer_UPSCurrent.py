@@ -50,14 +50,33 @@ class Mode:
     BVOLT_CONTINUOUS        = 0x06      # bus voltage continuous
     SANDBVOLT_CONTINUOUS    = 0x07      # shunt and bus voltage continuous
 
+def find_ina219_address(i2c_bus=1):
+    """Scan the I²C bus for devices and return the first detected address."""
+    bus = smbus.SMBus(i2c_bus)
+    for addr in range(0x03, 0x77):  # Valid I²C address range
+        try:
+            bus.write_quick(addr)  # Quick test to see if a device responds
+            return addr
+        except OSError:
+            continue
+    print("DEBUG: No INA219 device found on the I²C bus.")
+    return None
+
 class UPSCurrentSensor:
     """Wrapper for reading current from the UPS HAT using INA219."""
     
-    def __init__(self, i2c_bus=1, addr=0x42):
+    def __init__(self, i2c_bus=1, addr=none):
         try:
             self.bus = smbus.SMBus(i2c_bus)
         except Exception as e:
             raise RuntimeError(f"Failed to open I2C bus {i2c_bus}: {e}")
+        
+        # Auto-detect the I²C address if not provided
+        self.addr = addr if addr is not None else find_ina219_address(i2c_bus)
+        if self.addr is None:
+            raise RuntimeError("No INA219 device found on the I²C bus!")
+        print(f"DEBUG: Using INA219 device at address: {hex(self.addr)}")
+
         self.addr = addr
         self._cal_value = 0
         self._current_lsb = 0
@@ -73,6 +92,10 @@ class UPSCurrentSensor:
         temp[1] = data & 0xFF
         temp[0] =(data & 0xFF00) >> 8
         self.bus.write_i2c_block_data(self.addr,address,temp)
+        try:
+            self.bus.write_i2c_block_data(self.addr, address, temp)
+        except Exception as e:
+            raise IOError(f"I2C write error at register {hex(address)}: {e}")
 
     def set_calibration_32V_2A(self):
         """Configures to INA219 to be able to measure up to 32V and 2A of current. Counter
