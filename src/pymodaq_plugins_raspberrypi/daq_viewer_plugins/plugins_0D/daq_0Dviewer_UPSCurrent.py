@@ -53,7 +53,7 @@ class Mode:
 class UPSCurrentSensor:
     """Wrapper for reading current from the UPS HAT using INA219."""
     
-    def __init__(self, i2c_bus=1, addr=0x40):
+    def __init__(self, i2c_bus=1, addr=0x42):
         try:
             self.bus = smbus.SMBus(i2c_bus)
         except Exception as e:
