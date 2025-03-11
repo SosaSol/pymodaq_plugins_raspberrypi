@@ -5,7 +5,7 @@ from pymodaq.utils.data import DataFromPlugins, DataToExport
 from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, comon_parameters, main
 from pymodaq.utils.parameter import Parameter
 
-from ..hardware.INA219_wrapper import INA219Wrapper
+from hardware.INA219_wrapper import INA219Wrapper
 
 # INA219 register addresses
 _REG_CONFIG       = 0x00 # Config Register (R/W)
