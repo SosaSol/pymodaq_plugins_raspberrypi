@@ -11,16 +11,13 @@ class TemperatureSensor:
     def __init__(self):
         """Initialize the temperature sensor (using the CPU temperature file)."""
         self.sensor = "/sys/class/thermal/thermal_zone0/temp"  # Path to the CPU temperature file
-        print(f"DEBUG: Temperature sensor file set to {self.sensor}")
 
     def get_temperature(self) -> float:
         """Fetch the CPU temperature (in °C)."""
         try:
             with open(self.sensor, "r") as file:
                 temp_str = file.read().strip()
-                print(f"DEBUG: Raw temperature string: {temp_str}")
                 temp = float(temp_str) / 1000  # Convert from millidegrees to degrees Celsius
-                print(f"DEBUG: Converted temperature: {temp} °C")
                 return temp
         except Exception as e:
             print(f"Error reading temperature: {e}")
