@@ -22,8 +22,8 @@ class GPIORelayWrapper:
         if GPIO.getmode() is None:
             GPIO.setmode(GPIO.BCM)
         GPIO.cleanup(self.pin)  # Clean only the specific pin
-        GPIO.setup(self.pin, GPIO.OUT)
-        GPIO.output(self.pin, GPIO.HIGH)  # Default to OFF
+        GPIO.setup(self.pin, GPIO.OUT, initial=GPIO.HIGH)  # Set relay to OFF at startup
+
 
     def get_state(self) -> int:
         """Get the current relay state (0 = OFF, 1 = ON)."""
@@ -62,12 +62,16 @@ class DAQ_Move_Relay(DAQ_Move_base):
         """Initialize GPIO pin."""
         self.ini_stage_init(slave_controller=controller)
 
-        if self.gpio_relay is None:  # Ensure it’s only initialized once
+        if self.gpio_relay is None:
             self.gpio_relay = GPIORelayWrapper(self.relay_pin)
+        
+        # Explicitly turn relay OFF at startup
+        self.gpio_relay.set_state(0)
 
         info = "Relay control initialized"
         initialized = True
         return info, initialized
+
 
     def get_actuator_value(self):
         """Get the current relay state (0 = OFF, 1 = ON)."""
