@@ -35,19 +35,24 @@ class DAQ_Move_Relay(DAQ_Move_base):
         self.ini_stage_init(slave_controller=controller)
 
         if self.is_master:
-            GPIO.setmode(GPIO.BCM)
+            if not GPIO.getmode():  # Only set mode if not already set
+                GPIO.setmode(GPIO.BCM)
             self.setup_gpio(self.relay_pin)
 
         info = "Relay control initialized"
         initialized = True
         return info, initialized
 
+
     def setup_gpio(self, pin):
         """Setup GPIO pin for relay control"""
+        if not GPIO.getmode():  # Ensure mode is set before configuring pins
+            GPIO.setmode(GPIO.BCM)
         GPIO.cleanup()  # Reset all GPIOs to avoid conflicts
         GPIO.setup(pin, GPIO.OUT)
         GPIO.output(pin, GPIO.HIGH)  # Default to OFF
         self.relay_pin = pin  # Update active pin
+
 
     def get_actuator_value(self):
         """Get the current relay state (0 = OFF, 1 = ON)."""
