@@ -58,6 +58,12 @@ class DAQ_Move_Relay(DAQ_Move_base):
 
         self.emit_status(ThreadCommand('Update_Status', [f'Relay turned {state_str}']))
 
+    def move_home(self):
+        """Set relay to OFF (safe home position)."""
+        GPIO.output(self.RELAY_PIN, GPIO.HIGH)  # Ensure relay is OFF
+        self.settings.child('relay_state').setValue('OFF')  # Update UI
+        self.emit_status(ThreadCommand('Update_Status', ['Relay moved to HOME (OFF)']))
+
     def stop_motion(self):
         """Turn relay OFF (safe stop)."""
         GPIO.output(self.RELAY_PIN, GPIO.HIGH)
