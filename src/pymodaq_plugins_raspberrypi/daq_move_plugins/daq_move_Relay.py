@@ -1,4 +1,5 @@
 from typing import Union, List, Dict
+
 import RPi.GPIO as GPIO
 from pymodaq.control_modules.move_utility_classes import (
     DAQ_Move_base, comon_parameters_fun, main, DataActuatorType, DataActuator
@@ -39,7 +40,10 @@ class GPIORelayWrapper:
 
 
 class DAQ_Move_Relay(DAQ_Move_base):
-    """PyMoDAQ plugin to control a relay using GPIO on a Raspberry Pi."""
+    """PyMoDAQ plugin to control a relay using GPIO on a Raspberry Pi.
+
+    This plugin allows switching a relay ON/OFF through a user-selectable GPIO pin.
+    """
 
     is_multiaxes = False
     _axis_names: Union[List[str], Dict[str, int]] = ['relay']
@@ -75,21 +79,23 @@ class DAQ_Move_Relay(DAQ_Move_base):
 
     def get_actuator_value(self):
         """Get the current relay state (0 = OFF, 1 = ON)."""
-        state = self.gpio_relay.get_state()
-        return DataActuator(data=state)
+        state = GPIO.input(self.relay_pin)
+        return DataActuator(data=int(not state))  # Relay is ACTIVE LOW (0 = ON, 1 = OFF)
 
     def move_abs(self, value: DataActuator):
         """Switch relay ON/OFF based on the provided value (1 = ON, 0 = OFF)."""
+
         value = int(value.value())  # Ensure value is an integer (0 or 1)
-        self.gpio_relay.set_state(value)
+        GPIO.output(self.relay_pin, GPIO.LOW if value == 1 else GPIO.HIGH)
 
         state_str = "ON" if value == 1 else "OFF"
         self.settings.child('relay_state').setValue(state_str)  # Update UI
+
         self.emit_status(ThreadCommand('Update_Status', [f'Relay turned {state_str}']))
 
     def move_home(self):
         """Set relay to OFF (safe home position)."""
-        self.gpio_relay.set_state(0)  # Ensure relay is OFF
+        GPIO.output(self.relay_pin, GPIO.HIGH)  # Ensure relay is OFF
         self.settings.child('relay_state').setValue('OFF')  # Update UI
         self.emit_status(ThreadCommand('Update_Status', ['Relay moved to HOME (OFF)']))
 
