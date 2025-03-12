@@ -13,28 +13,25 @@ class GPIORelayWrapper:
     def __init__(self, pin: int):
         """Initialize GPIO mode and setup relay pin."""
         self.pin = pin
+        self.is_setup = False  # Track if this pin is currently set up
         self._setup_gpio()
 
     def _setup_gpio(self):
         """Setup the GPIO pin for relay control."""
         if GPIO.getmode() is None:
             GPIO.setmode(GPIO.BCM)
-        # Clean up only the specific pin to avoid interfering with other channels
-        try:
-            GPIO.cleanup(self.pin)
-        except Exception:
-            pass
+        # Setup the pin without calling cleanup unnecessarily.
         GPIO.setup(self.pin, GPIO.OUT)
         GPIO.output(self.pin, GPIO.HIGH)  # Default to OFF
+        self.is_setup = True
 
     def change_pin(self, new_pin: int):
         """Change the relay control pin dynamically."""
         if new_pin != self.pin:
-            # Clean up only the current pin before changing
-            try:
+            # Clean up the old pin only if it was set up
+            if self.is_setup:
                 GPIO.cleanup(self.pin)
-            except Exception:
-                pass
+                self.is_setup = False
             self.pin = new_pin
             self._setup_gpio()
 
@@ -49,10 +46,9 @@ class GPIORelayWrapper:
 
     def cleanup(self):
         """Cleanup GPIO when done."""
-        try:
+        if self.is_setup:
             GPIO.cleanup(self.pin)
-        except Exception:
-            pass
+            self.is_setup = False
 
 
 class DAQ_Move_Relay(DAQ_Move_base):
@@ -73,7 +69,7 @@ class DAQ_Move_Relay(DAQ_Move_base):
         """Initialize attributes"""
         self.controller = None  # Not needed for GPIO, but kept for consistency
         self.relay_pin = self.settings['relay_pin']  # Get initial relay pin
-        self.gpio_relay = GPIORelayWrapper(self.relay_pin)  # Use wrapper class
+        self.gpio_relay = GPIORelayWrapper(self.relay_pin)  # Use our wrapper class
 
     def ini_stage(self, controller=None):
         """Initialize GPIO pin"""
