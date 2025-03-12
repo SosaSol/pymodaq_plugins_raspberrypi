@@ -1,56 +1,77 @@
-from pymodaq.control_modules.move_module import DAQ_Move_base
+from typing import Union, List, Dict
+
+import RPi.GPIO as GPIO
+from pymodaq.control_modules.move_utility_classes import DAQ_Move_base, comon_parameters_fun, main, DataActuatorType, DataActuator
 from pymodaq.utils.daq_utils import ThreadCommand
 from pymodaq.utils.parameter import Parameter
-import RPi.GPIO as GPIO
+
 
 class DAQ_Move_Relay(DAQ_Move_base):
-    """
-    Plugin for controlling a relay connected to a Raspberry Pi GPIO pin.
+    """PyMoDAQ plugin to control a relay using GPIO on a Raspberry Pi.
+
+    This plugin allows switching a relay ON/OFF through GPIO pin 26.
     """
 
-    _controller_units = 'State'  # Relay state: ON or OFF
+    is_multiaxes = False
+    _axis_names: Union[List[str], Dict[str, int]] = ['relay']
+    _controller_units: Union[str, List[str]] = ''
+    _epsilon: Union[float, List[float]] = 0
+    data_actuator_type = DataActuatorType.DataActuator  # Controls an ON/OFF device
+
+    # Define GPIO pin for the relay
+    RELAY_PIN = 26
+
+    params = [
+        {'title': 'Relay State', 'name': 'relay_state', 'type': 'list', 'limits': ['OFF', 'ON'], 'value': 'OFF'}
+    ] + comon_parameters_fun(is_multiaxes, axis_names=_axis_names, epsilon=_epsilon)
 
     def ini_attributes(self):
-        self.controller = None
-        self.settings.add_parameter(
-            Parameter.create(
-                name='relay_state', type='bool', value=False,
-                tip='Relay ON (True) or OFF (False)'
-            )
-        )
+        """Initialize attributes"""
+        self.controller = None  # Not needed for GPIO, but kept for consistency
 
     def ini_stage(self, controller=None):
-        """
-        Initialize the GPIO pin for relay control.
-        """
-        self.controller = GPIO
-        self.controller.setmode(GPIO.BCM)
-        self.pin = 26  # GPIO pin number
-        self.controller.setup(self.pin, GPIO.OUT)
-        self.controller.output(self.pin, GPIO.HIGH)  # Start with relay OFF
-        return "Relay initialized"
+        """Initialize GPIO pin"""
+        self.ini_stage_init(slave_controller=controller)
 
-    def close(self):
-        """
-        Clean up GPIO settings.
-        """
-        if self.controller:
-            self.controller.cleanup()
+        if self.is_master:
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setup(self.RELAY_PIN, GPIO.OUT)
+            GPIO.output(self.RELAY_PIN, GPIO.HIGH)  # Default to OFF
 
-    def move_Abs(self, value):
-        """
-        Set relay state based on the absolute value.
-        """
-        if value > 0:
-            self.controller.output(self.pin, GPIO.LOW)  # Relay ON
-            self.emit_status(ThreadCommand('Update_Status', [[value, 'Relay ON']]))
-        else:
-            self.controller.output(self.pin, GPIO.HIGH)  # Relay OFF
-            self.emit_status(ThreadCommand('Update_Status', [[value, 'Relay OFF']]))
+        info = "Relay control initialized"
+        initialized = True
+        return info, initialized
+
+    def get_actuator_value(self):
+        """Get the current relay state (0 = OFF, 1 = ON)."""
+        state = GPIO.input(self.RELAY_PIN)
+        return DataActuator(data=int(not state))  # Relay is ACTIVE LOW (0 = ON, 1 = OFF)
+
+    def move_abs(self, value: DataActuator):
+        """Switch relay ON/OFF based on the provided value (1 = ON, 0 = OFF)."""
+
+        value = int(value.value())  # Ensure value is an integer (0 or 1)
+        GPIO.output(self.RELAY_PIN, GPIO.LOW if value == 1 else GPIO.HIGH)
+
+        state_str = "ON" if value == 1 else "OFF"
+        self.settings.child('relay_state').setValue(state_str)  # Update UI
+
+        self.emit_status(ThreadCommand('Update_Status', [f'Relay turned {state_str}']))
 
     def stop_motion(self):
-        """
-        Emergency stop: Turn relay OFF.
-        """
-        self.controller.output(self.pin, GPIO.HIGH)
-        self.emit_status(ThreadCommand('Update_Status', [[0, 'Relay stopped (OFF)']]))
+        """Turn relay OFF (safe stop)."""
+        GPIO.output(self.RELAY_PIN, GPIO.HIGH)
+        self.emit_status(ThreadCommand('Update_Status', ['Relay turned OFF (Safe Stop)']))
+
+    def commit_settings(self, param: Parameter):
+        """Handle setting changes (not needed for simple ON/OFF relay)."""
+        pass
+
+    def close(self):
+        """Clean up GPIO when the plugin is closed."""
+        GPIO.cleanup()
+        self.emit_status(ThreadCommand('Update_Status', ['GPIO cleanup done']))
+
+
+if __name__ == '__main__':
+    main(__file__)
