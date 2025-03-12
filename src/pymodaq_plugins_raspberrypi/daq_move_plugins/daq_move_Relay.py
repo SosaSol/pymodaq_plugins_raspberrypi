@@ -7,6 +7,8 @@ from pymodaq.utils.daq_utils import ThreadCommand
 from pymodaq.utils.parameter import Parameter
 
 
+VALID_GPIO_PINS = [2, 3, 4, 17, 18, 27, 22, 23, 24, 25, 5, 6, 12, 13, 19, 20, 21, 26, 16]
+
 class GPIORelayWrapper:
     """Handles GPIO operations for controlling a relay."""
     
@@ -19,16 +21,9 @@ class GPIORelayWrapper:
         """Setup the GPIO pin for relay control."""
         if GPIO.getmode() is None:
             GPIO.setmode(GPIO.BCM)
-        GPIO.cleanup()  # Reset all GPIOs to avoid conflicts
+        GPIO.cleanup(self.pin)  # Clean only the specific pin
         GPIO.setup(self.pin, GPIO.OUT)
         GPIO.output(self.pin, GPIO.HIGH)  # Default to OFF
-
-    def change_pin(self, new_pin: int):
-        """Change the relay control pin dynamically."""
-        if new_pin != self.pin:
-            GPIO.cleanup()  # Clean up before changing
-            self.pin = new_pin
-            self._setup_gpio()
 
     def get_state(self) -> int:
         """Get the current relay state (0 = OFF, 1 = ON)."""
@@ -39,8 +34,8 @@ class GPIORelayWrapper:
         GPIO.output(self.pin, GPIO.LOW if state == 1 else GPIO.HIGH)
 
     def cleanup(self):
-        """Cleanup GPIO when done."""
-        GPIO.cleanup()
+        """Cleanup only the specific relay pin."""
+        GPIO.cleanup(self.pin)
 
 
 class DAQ_Move_Relay(DAQ_Move_base):
@@ -58,14 +53,18 @@ class DAQ_Move_Relay(DAQ_Move_base):
     ] + comon_parameters_fun(is_multiaxes, axis_names=_axis_names, epsilon=_epsilon)
 
     def ini_attributes(self):
-        """Initialize attributes"""
+        """Initialize attributes."""
         self.controller = None  # Not needed for GPIO, but kept for consistency
         self.relay_pin = self.settings['relay_pin']  # Get initial relay pin
-        self.gpio_relay = GPIORelayWrapper(self.relay_pin)  # Use wrapper class
+        self.gpio_relay = None  # Initialize as None
 
     def ini_stage(self, controller=None):
-        """Initialize GPIO pin"""
+        """Initialize GPIO pin."""
         self.ini_stage_init(slave_controller=controller)
+
+        if self.gpio_relay is None:  # Ensure it’s only initialized once
+            self.gpio_relay = GPIORelayWrapper(self.relay_pin)
+
         info = "Relay control initialized"
         initialized = True
         return info, initialized
@@ -96,14 +95,50 @@ class DAQ_Move_Relay(DAQ_Move_base):
 
     def commit_settings(self, param: Parameter):
         """Handle setting changes dynamically."""
-        if param.name() == 'relay_pin':
+        if param.name() == "relay_pin":
             new_pin = param.value()
-            self.gpio_relay.change_pin(new_pin)
-            self.emit_status(ThreadCommand('Update_Status', [f'Relay pin changed to {new_pin}']))
+
+            # Validate pin number
+            if new_pin not in VALID_GPIO_PINS:
+                self.emit_status(ThreadCommand("Update_Status", 
+                                               [f"Invalid GPIO pin {new_pin}. Choose from: {VALID_GPIO_PINS}"]))
+                return
+
+            if new_pin != self.relay_pin:
+                try:
+                    # Close existing GPIO wrapper
+                    if self.gpio_relay:
+                        self.gpio_relay.cleanup()
+
+                    # Initialize a new GPIO wrapper
+                    self.gpio_relay = GPIORelayWrapper(new_pin)
+                    self.relay_pin = new_pin
+
+                    self.emit_status(ThreadCommand("Update_Status", 
+                                                   [f"Relay pin updated to {new_pin}"]))
+
+                except Exception as e:
+                    self.emit_status(ThreadCommand("Update_Status", 
+                                                   [f"Failed to update relay pin: {e}"]))
+
+        elif param.name() == "relay_state":
+            new_state = param.value()
+            try:
+                state_int = 1 if new_state == "ON" else 0
+                if self.gpio_relay:
+                    self.gpio_relay.set_state(state_int)
+
+                self.emit_status(ThreadCommand("Update_Status", 
+                                               [f"Relay state changed to {new_state}"]))
+
+            except Exception as e:
+                self.emit_status(ThreadCommand("Update_Status", 
+                                               [f"Error setting relay state: {e}"]))
 
     def close(self):
         """Clean up GPIO when the plugin is closed."""
-        self.gpio_relay.cleanup()
+        if self.gpio_relay:
+            self.gpio_relay.cleanup()
         self.emit_status(ThreadCommand('Update_Status', ['GPIO cleanup done']))
 
 
